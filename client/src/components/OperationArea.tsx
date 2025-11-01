@@ -19,32 +19,30 @@ type OperationAreaProps = {
 };
 
 // --- ProductRegistration ---
-const ProductRegistration: React.FC<Pick<OperationAreaProps, 'onAddToCart' | 'setPhase'> & { instanceId: string | undefined; setError: (error: string | null) => void }> = ({ onAddToCart, setPhase, instanceId, setError }) => {
+const ProductRegistration: React.FC<Pick<OperationAreaProps, 'onAddToCart' | 'setPhase' | 'setError'> & { instanceId: string | undefined }> = ({ onAddToCart, setPhase, instanceId, setError }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [fetchError, setFetchError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const PRODUCTS_PER_PAGE = 9;
 
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true);
-      setFetchError(null);
+      setError(null);
       try {
         const response = await fetch(`/api/instances/${instanceId}/products`);
         if (!response.ok) throw new Error('Failed to fetch products.');
         setProducts(await response.json());
-      } catch (err: any) { setFetchError(err.message); }
+      } catch (err: any) { setError(err.message); }
       finally { setIsLoading(false); }
     };
     fetchProducts();
-  }, [instanceId]);
+  }, [instanceId, setError]);
 
   const paginatedProducts = products.slice(page * PRODUCTS_PER_PAGE, (page + 1) * PRODUCTS_PER_PAGE);
   const totalPages = Math.ceil(products.length / PRODUCTS_PER_PAGE);
 
-  if (isLoading) return <div className="p-4">Loading products...</div>;
-  if (fetchError) return <div className="p-4 text-R8-300">Error: {fetchError}</div>;
+  if (isLoading) return <div className="p-4 flex items-center justify-center h-full">Loading products...</div>;
 
   return (
     <div className="p-4">
@@ -54,7 +52,7 @@ const ProductRegistration: React.FC<Pick<OperationAreaProps, 'onAddToCart' | 'se
         <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1} className="px-4 py-2 bg-G1-700 rounded disabled:opacity-50">次へ</button>
       </div>
       <div className="grid grid-cols-3 gap-2">
-        {paginatedProducts.map(p => <button key={p.id} onClick={() => { onAddToCart(p); setError(null); }} className="aspect-square bg-G0-800 hover:bg-G0-700 rounded-lg p-2 flex flex-col justify-center items-center text-center"><span className="text-sm">{p.name}</span><span className="text-xs text-G1-400">¥{p.price}</span></button>)}
+        {paginatedProducts.map(p => <button key={p.id} onClick={() => onAddToCart(p)} className="aspect-square bg-G0-800 hover:bg-G0-700 rounded-lg p-2 flex flex-col justify-center items-center text-center"><span className="text-sm">{p.name}</span><span className="text-xs text-G1-400">¥{p.price}</span></button>)}
         {Array.from({ length: PRODUCTS_PER_PAGE - paginatedProducts.length }).map((_, i) => <div key={`empty-${i}`} className="aspect-square bg-G0-900 rounded-lg"></div>)}
       </div>
       <div className="flex justify-end mt-4">
@@ -65,7 +63,7 @@ const ProductRegistration: React.FC<Pick<OperationAreaProps, 'onAddToCart' | 'se
 };
 
 // --- PaymentInterface ---
-const PaymentInterface: React.FC<Pick<OperationAreaProps, 'setPhase' | 'totalPrice' | 'finalizeSale' | 'error' | 'setError'> > = ({ setPhase, totalPrice, finalizeSale, error, setError }) => {
+const PaymentInterface: React.FC<Pick<OperationAreaProps, 'setPhase' | 'totalPrice' | 'finalizeSale' | 'error' | 'setError' | 'cart'> > = ({ setPhase, totalPrice, finalizeSale, error, setError, cart }) => {
   const [paidAmount, setPaidAmount] = useState<DenominationCount>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -95,7 +93,6 @@ const PaymentInterface: React.FC<Pick<OperationAreaProps, 'setPhase' | 'totalPri
           ¥{changeDue.toLocaleString()}
         </span>
       </div>
-
       <div className="flex-grow grid grid-cols-2 md:grid-cols-3 gap-2">
         {denominations.map(d => (
           <div key={d} className="bg-G0-800 rounded-lg p-2 flex flex-col items-center justify-center">
@@ -111,7 +108,7 @@ const PaymentInterface: React.FC<Pick<OperationAreaProps, 'setPhase' | 'totalPri
       <div className="flex justify-between mt-4">
         <button onClick={() => setPhase('registering')} className="px-6 py-3 bg-G1-700 text-G0-50 font-bold rounded-lg">戻る</button>
         <button onClick={() => setPaidAmount({})} className="px-6 py-3 bg-R8-700 text-G0-50 font-bold rounded-lg">クリア</button>
-        <button onClick={handleSubmit} disabled={changeDue < 0 || isSubmitting} className="px-6 py-3 bg-G8-500 text-G0-1000 font-bold rounded-lg disabled:bg-G1-800 disabled:cursor-not-allowed">
+        <button onClick={handleSubmit} disabled={changeDue < 0 || isSubmitting || cart.length === 0} className="px-6 py-3 bg-G8-500 text-G0-1000 font-bold rounded-lg disabled:bg-G1-800 disabled:cursor-not-allowed">
           {isSubmitting ? '処理中...' : '入金完了'}
         </button>
       </div>
@@ -164,9 +161,9 @@ const OperationArea: React.FC<OperationAreaProps> = (props) => {
 
   switch (props.phase) {
     case 'registering':
-      return <ProductRegistration {...props} instanceId={instanceId} setError={props.setError} />;
+      return <ProductRegistration {...props} instanceId={instanceId} />;
     case 'payment':
-      return <PaymentInterface {...props} setError={props.setError} />;
+      return <PaymentInterface {...props} />;
     case 'change':
       return <ChangeInterface {...props} />;
     default:
