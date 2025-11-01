@@ -13,9 +13,6 @@ const HomePage: React.FC = () => {
     try {
       const response = await fetch('/api/instances', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
       if (!response.ok) {
         throw new Error('Failed to create instance. Please try again.');
