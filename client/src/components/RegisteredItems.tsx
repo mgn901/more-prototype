@@ -80,32 +80,32 @@ const RegisteredItems: React.FC<RegisteredItemsProps> = ({ cart, discounts }) =>
   const subtotal = cart.reduce((total, item) => total + item.price, 0);
 
   return (
-    <div className="bg-G0-1000 p-4 flex-grow flex flex-col">
-      <h2 className="text-lg font-semibold mb-4 border-b border-G1-800 pb-2">登録商品一覧</h2>
+    <div className="bg-g0-1000 p-4 flex-grow flex flex-col">
+      <h2 className="text-lg font-semibold mb-4 border-b border-g1-800 pb-2">登録商品一覧</h2>
       {cart.length === 0 ? (
         <div className="flex-grow flex items-center justify-center">
-          <p className="text-G1-500">商品はまだ登録されていません</p>
+          <p className="text-g1-500">商品はまだ登録されていません</p>
         </div>
       ) : (
         <div className="flex-grow overflow-y-auto">
           {aggregatedCart.map(item => (
             <div key={item.id} className="grid grid-cols-4 gap-2 items-center mb-2">
               <span className="col-span-2">{item.name}</span>
-              <span className="text-G1-400 text-sm">x{item.quantity}</span>
+              <span className="text-g1-400 text-sm">x{item.quantity}</span>
               <span className="text-right font-mono">¥{(item.price * item.quantity).toLocaleString()}</span>
             </div>
           ))}
         </div>
       )}
-      <div className="border-t border-G1-600 pt-4 mt-4 space-y-2">
+      <div className="border-t border-g1-600 pt-4 mt-4 space-y-2">
         {appliedDiscounts.length > 0 && (
           <>
-            <div className="flex justify-between items-center text-G1-300">
+            <div className="flex justify-between items-center text-g1-300">
               <span>小計:</span>
               <span className="font-mono">¥{subtotal.toLocaleString()}</span>
             </div>
             {appliedDiscounts.map(d => (
-              <div key={d.id} className="flex justify-between items-center text-G8-300">
+              <div key={d.id} className="flex justify-between items-center text-g8-300">
                 <span>{d.description}</span>
                 <span className="font-mono">- ¥{d.amount.toLocaleString()}</span>
               </div>

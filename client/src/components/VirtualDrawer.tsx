@@ -65,19 +65,19 @@ const VirtualDrawer: React.FC = () => {
   }, [instanceId, calculateBalance]);
 
   return (
-    <div className="bg-G0-800 p-4 h-full flex flex-col">
+    <div className="bg-g0-800 p-4 h-full flex flex-col">
       <h2 className="text-lg font-semibold mb-4">仮想ドロワ</h2>
       {isLoading ? <p>Loading...</p> : (
         <div className="flex-grow space-y-2 overflow-y-auto">
           {denominations.map(denom => (
             <div key={denom} className="flex justify-between items-center text-sm">
-              <span className="text-G1-300">{denom.toLocaleString()}円 x</span>
+              <span className="text-g1-300">{denom.toLocaleString()}円 x</span>
               <span className="font-mono text-lg">{balance[denom] || 0}</span>
             </div>
           ))}
         </div>
       )}
-      <div className="border-t border-G1-600 pt-4 mt-4">
+      <div className="border-t border-g1-600 pt-4 mt-4">
           <div className="flex justify-between items-center font-bold text-xl">
             <span>合計:</span>
             <span>¥{total.toLocaleString()}</span>
@@ -85,7 +85,7 @@ const VirtualDrawer: React.FC = () => {
       </div>
       <Link 
         to={`/${instanceId}/drawer`} 
-        className="mt-4 bg-T5B3-500 hover:bg-T5B3-400 text-G0-1000 font-bold rounded py-2 px-4 text-center transition-colors"
+        className="mt-4 bg-t5b3-500 hover:bg-t5b3-400 text-g0-1000 font-bold rounded py-2 px-4 text-center transition-colors"
       >
         入出金
       </Link>

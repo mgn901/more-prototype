@@ -96,25 +96,25 @@ const PosInstancePage: React.FC = () => {
   };
 
   if (isLoading) {
-    return <div className="min-h-screen bg-G0-1000 text-G0-0 flex items-center justify-center">Loading POS instance...</div>;
+    return <div className="min-h-screen bg-g0-1000 text-g0-0 flex items-center justify-center">Loading POS instance...</div>;
   }
 
   if (error && !instanceExists) {
     return (
-      <div className="min-h-screen bg-G0-1000 text-G0-0 flex flex-col items-center justify-center">
-        <div className="bg-R8-800 text-R8-100 p-4 rounded-md mb-4">Error: {error}</div>
-        <Link to="/" className="text-T4B4-300 hover:underline">Return to Home</Link>
+      <div className="min-h-screen bg-g0-1000 text-g0-0 flex flex-col items-center justify-center">
+        <div className="bg-r8-800 text-r8-100 p-4 rounded-md mb-4">Error: {error}</div>
+        <Link to="/" className="text-t4b4-300 hover:underline">Return to Home</Link>
       </div>
     );
   }
 
   if (!instanceExists) {
     // This case should ideally be covered by the error state, but as a fallback:
-    return <div className="min-h-screen bg-G0-1000 text-G0-0 flex items-center justify-center">Instance not found.</div>;
+    return <div className="min-h-screen bg-g0-1000 text-g0-0 flex items-center justify-center">Instance not found.</div>;
   }
 
   return (
-    <div className="min-h-screen bg-G0-1000 text-G0-100 flex flex-col">
+    <div className="min-h-screen bg-g0-1000 text-g0-100 flex flex-col">
       <MenuBar />
       <div className="flex-grow flex flex-col md:flex-row overflow-hidden">
         <main className="flex-grow flex flex-col w-full md:w-2/3 h-full">

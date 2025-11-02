@@ -62,26 +62,26 @@ const AddDiscountForm: React.FC<AddDiscountFormProps> = ({ products, onDiscountA
   };
 
   return (
-    <div className="bg-G0-900 p-6 rounded-lg shadow-lg mb-8">
+    <div className="bg-g0-900 p-6 rounded-lg shadow-lg mb-8">
       <h3 className="text-xl font-semibold mb-4">新しい割引条件を追加</h3>
       <form onSubmit={handleSubmit} className="space-y-6">
-        {error && <p className="bg-R8-700 text-R8-100 p-3 rounded-md">{error}</p>}
+        {error && <p className="bg-r8-700 text-r8-100 p-3 rounded-md">{error}</p>}
         
         {/* Row 1: Type and Products */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-1">
-            <label htmlFor="discount-type" className="block mb-2 text-sm font-medium text-G1-300">割引種別</label>
-            <select id="discount-type" value={type} onChange={e => setType(e.target.value as any)} className="w-full bg-G0-1000 border border-G1-700 rounded-md p-2.5">
+            <label htmlFor="discount-type" className="block mb-2 text-sm font-medium text-g1-300">割引種別</label>
+            <select id="discount-type" value={type} onChange={e => setType(e.target.value as any)} className="w-full bg-g0-1000 border border-g1-700 rounded-md p-2.5">
               <option value="quantity_discount">個数割引 (%引き)</option>
               <option value="value_discount">個数値引 (円引き)</option>
             </select>
           </div>
           <div className="md:col-span-2">
-            <label className="block mb-2 text-sm font-medium text-G1-300">対象商品 (複数選択可)</label>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 bg-G0-1000 border border-G1-700 rounded-md p-2 max-h-32 overflow-y-auto">
+            <label className="block mb-2 text-sm font-medium text-g1-300">対象商品 (複数選択可)</label>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 bg-g0-1000 border border-g1-700 rounded-md p-2 max-h-32 overflow-y-auto">
               {products.map(p => (
-                <label key={p.id} className="flex items-center space-x-2 p-1 rounded-md hover:bg-G1-800">
-                  <input type="checkbox" checked={selectedProductIds.includes(p.id)} onChange={() => handleProductSelect(p.id)} className="form-checkbox bg-G0-1000 text-T4B4-500" />
+                <label key={p.id} className="flex items-center space-x-2 p-1 rounded-md hover:bg-g1-800">
+                  <input type="checkbox" checked={selectedProductIds.includes(p.id)} onChange={() => handleProductSelect(p.id)} className="form-checkbox bg-g0-1000 text-t4b4-500" />
                   <span>{p.name}</span>
                 </label>
               ))}
@@ -92,19 +92,19 @@ const AddDiscountForm: React.FC<AddDiscountFormProps> = ({ products, onDiscountA
         {/* Row 2: Quantity and Value */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-                <label htmlFor="req-quantity" className="block mb-2 text-sm font-medium text-G1-300">適用される購入数</label>
-                <input type="number" id="req-quantity" value={requiredQuantity} onChange={e => setRequiredQuantity(e.target.value)} required min="1" className="w-full bg-G0-1000 border border-G1-700 rounded-md p-2.5" placeholder="例: 3" />
+                <label htmlFor="req-quantity" className="block mb-2 text-sm font-medium text-g1-300">適用される購入数</label>
+                <input type="number" id="req-quantity" value={requiredQuantity} onChange={e => setRequiredQuantity(e.target.value)} required min="1" className="w-full bg-g0-1000 border border-g1-700 rounded-md p-2.5" placeholder="例: 3" />
             </div>
             <div>
-                <label htmlFor="discount-value" className="block mb-2 text-sm font-medium text-G1-300">
+                <label htmlFor="discount-value" className="block mb-2 text-sm font-medium text-g1-300">
                   {type === 'quantity_discount' ? '割引率 (%)' : '値引額 (円)'}
                 </label>
-                <input type="number" id="discount-value" value={discountValue} onChange={e => setDiscountValue(e.target.value)} required min="1" className="w-full bg-G0-1000 border border-G1-700 rounded-md p-2.5" placeholder={type === 'quantity_discount' ? '例: 10' : '例: 100'} />
+                <input type="number" id="discount-value" value={discountValue} onChange={e => setDiscountValue(e.target.value)} required min="1" className="w-full bg-g0-1000 border border-g1-700 rounded-md p-2.5" placeholder={type === 'quantity_discount' ? '例: 10' : '例: 100'} />
             </div>
         </div>
 
         <div className="text-right pt-2">
-          <button type="submit" disabled={isSubmitting} className="bg-T4B4-500 hover:bg-T4B4-400 text-G0-1000 font-bold rounded-lg py-2.5 px-6 disabled:bg-G1-800">
+          <button type="submit" disabled={isSubmitting} className="bg-t4b4-500 hover:bg-t4b4-400 text-g0-1000 font-bold rounded-lg py-2.5 px-6 disabled:bg-g1-800">
             {isSubmitting ? '作成中...' : '割引を作成'}
           </button>
         </div>

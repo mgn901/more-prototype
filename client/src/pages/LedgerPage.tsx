@@ -39,12 +39,12 @@ const LedgerEntryRow: React.FC<{ entry: LedgerEntry, onRevert: (entryId: number)
   const rowClass = entry.is_reverted ? 'opacity-50 text-decoration-line: line-through' : '';
 
   return (
-    <tr className={`border-b border-G0-800 ${rowClass}`}>
-      <td className="p-3 text-sm text-G1-400">{new Date(entry.created_at).toLocaleString()}</td>
+    <tr className={`border-b border-g0-800 ${rowClass}`}>
+      <td className="p-3 text-sm text-g1-400">{new Date(entry.created_at).toLocaleString()}</td>
       <td className="p-3">{description}</td>
       <td className="p-3 text-center">
         {!entry.is_reverted && (
-          <button onClick={() => onRevert(entry.id)} className="text-R8-300 hover:text-R8-200 text-sm">取り消し</button>
+          <button onClick={() => onRevert(entry.id)} className="text-r8-300 hover:text-r8-200 text-sm">取り消し</button>
         )}
       </td>
     </tr>
@@ -91,19 +91,19 @@ const LedgerPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-G0-1000 text-G0-100 flex flex-col">
+    <div className="min-h-screen bg-g0-1000 text-g0-100 flex flex-col">
       <MenuBar />
       <div className="container mx-auto p-4 md:p-8">
-        <h1 className="text-3xl font-bold text-T4B4-300 mb-6">台帳</h1>
-        {error && <p className="bg-R8-800 text-R8-100 p-3 rounded-md mb-6">{error}</p>}
-        <div className="bg-G0-900 rounded-lg shadow-lg overflow-hidden">
+        <h1 className="text-3xl font-bold text-t4b4-300 mb-6">台帳</h1>
+        {error && <p className="bg-r8-800 text-r8-100 p-3 rounded-md mb-6">{error}</p>}
+        <div className="bg-g0-900 rounded-lg shadow-lg overflow-hidden">
           {isLoading ? <p className="p-4">Loading ledger...</p> : (
             <table className="w-full">
-              <thead className="bg-G0-800">
+              <thead className="bg-g0-800">
                 <tr>
-                  <th className="p-3 text-left text-sm font-semibold text-G1-300 w-1/4">日時</th>
-                  <th className="p-3 text-left text-sm font-semibold text-G1-300 w-1/2">内容</th>
-                  <th className="p-3 text-center text-sm font-semibold text-G1-300 w-1/4">操作</th>
+                  <th className="p-3 text-left text-sm font-semibold text-g1-300 w-1/4">日時</th>
+                  <th className="p-3 text-left text-sm font-semibold text-g1-300 w-1/2">内容</th>
+                  <th className="p-3 text-center text-sm font-semibold text-g1-300 w-1/4">操作</th>
                 </tr>
               </thead>
               <tbody>
