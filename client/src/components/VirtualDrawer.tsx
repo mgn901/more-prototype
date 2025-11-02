@@ -3,8 +3,6 @@ import { Link, useParams } from 'react-router-dom';
 import type { LedgerEntry } from '../pages/LedgerPage.tsx';
 import { calculateBalance, DENOMINATIONS } from '../utils.ts';
 
-const denominations = [10000, 5000, 2000, 1000, 500, 100, 50, 10, 5, 1];
-
 const VirtualDrawer: React.FC = () => {
   const { instanceId } = useParams<{ instanceId: string }>();
   const [balance, setBalance] = useState<{ [key: number]: number }>({});
@@ -40,7 +38,7 @@ const VirtualDrawer: React.FC = () => {
       <h2 className="text-lg font-semibold mb-4">仮想ドロワ</h2>
       {isLoading ? <p>Loading...</p> : (
         <div className="flex-grow space-y-2 overflow-y-auto">
-          {denominations.map(denom => (
+          {DENOMINATIONS.map(denom => (
             <div key={denom} className="flex justify-between items-center text-sm">
               <span className="text-g1-300">{denom.toLocaleString()}円 x</span>
               <span className="font-mono text-lg">{balance[denom] || 0}</span>

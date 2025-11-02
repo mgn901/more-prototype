@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { Daos } from '../dao';
-import { calculateBalance } from '../utils.js';
+import { calculateBalance, DENOMINATIONS } from '../utils.js';
 
 const calculateOptimalPayout = (drawerBalance: { [key: number]: number }, amountToPay: number) => {
     const denominations = Object.keys(drawerBalance).map(Number).sort((a, b) => b - a);
@@ -34,9 +34,8 @@ const calculateOptimalPayout = (drawerBalance: { [key: number]: number }, amount
 };
 
 const getDrawerBalance = async (daos: Daos, instanceId: string) => {
-    const entries = await daos.ledger.listLedgerEntriesByPosInstance(instanceId);
-    const denominations = [10000, 5000, 2000, 1000, 500, 100, 50, 10, 5, 1];
-    return calculateBalance(entries, denominations);
+    const entries = await daos.ledger.listLedgerEntriesByPosInstance(instanceId);;
+    return calculateBalance(entries, DENOMINATIONS);
 };
 
 export const registerDrawerRoutes = (fastify: FastifyInstance, daos: Daos) => {
@@ -52,11 +51,9 @@ export const registerDrawerRoutes = (fastify: FastifyInstance, daos: Daos) => {
             let totalSales = 0;
             for (const entry of ledgerEntries) {
                 if (entry.entry_type === 'sale' && !entry.is_reverted) {
-                    if (entry.data.products && Array.isArray(entry.data.products)) {
-                        for (const productId of entry.data.products) {
-                            if (sellerProductMap.has(productId)) {
-                                totalSales += sellerProductMap.get(productId)!.price;
-                            }
+                    for (const productId of entry.data.products) {
+                        if (sellerProductMap.has(productId)) {
+                            totalSales += sellerProductMap.get(productId)!.price;
                         }
                     }
                 }

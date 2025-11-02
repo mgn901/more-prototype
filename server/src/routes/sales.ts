@@ -6,11 +6,10 @@ import { calculateBalance, DENOMINATIONS } from '../utils.js';
 
 // This function should be moved to a shared utility file
 const calculateChange = (drawerBalance: any, changeDue: number) => {
-  const denominations = [10000, 5000, 2000, 1000, 500, 100, 50, 10, 5, 1].sort((a, b) => b - a);
   let remaining = changeDue;
   const changeToGive: { [key: number]: number } = {};
 
-  for (const denom of denominations) {
+  for (const denom of DENOMINATIONS) {
     const countNeeded = Math.floor(remaining / denom);
     const countAvailable = drawerBalance[denom] || 0;
     const countToUse = Math.min(countNeeded, countAvailable);
@@ -42,9 +41,7 @@ export const registerSalesRoutes = (fastify: FastifyInstance, daos: Daos) => {
         return reply.code(400).send({ error: 'Payment amount is less than total price.' });
       }
 
-      // This is a simplified balance check. The full logic is in drawer.ts and should be centralized.
       const ledgerEntries = await daos.ledger.listLedgerEntriesByPosInstance(instanceId);
-      // Simplified balance calculation for this route
       const drawerBalance = calculateBalance(ledgerEntries, DENOMINATIONS)
       for (const [denom, count] of Object.entries(paidAmount)) {
         drawerBalance[parseInt(denom)] = (drawerBalance[parseInt(denom)] || 0) + count;
