@@ -5,6 +5,7 @@ import { registerProductsRoutes } from './products';
 import { registerLedgerRoutes } from './ledger';
 import { registerSalesRoutes } from './sales';
 import { registerDiscountsRoutes } from './discounts';
+import { registerDrawerRoutes } from './drawer';
 
 export const registerRoutes = (fastify: FastifyInstance, daos: Daos) => {
   registerPosInstancesRoutes(fastify, daos);
@@ -12,4 +13,5 @@ export const registerRoutes = (fastify: FastifyInstance, daos: Daos) => {
   registerLedgerRoutes(fastify, daos);
   registerSalesRoutes(fastify, daos);
   registerDiscountsRoutes(fastify, daos);
+  registerDrawerRoutes(fastify, daos);
 };

@@ -18,28 +18,62 @@ const VirtualDrawer: React.FC = () => {
 
   const calculateBalance = useCallback((entries: LedgerEntry[]) => {
     const newBalance = denominations.reduce((acc, denom) => ({ ...acc, [denom]: 0 }), {});
+    const entryMap = new Map(entries.map(e => [e.id, e]));
 
     for (const entry of entries) {
-      if (entry.is_reverted) continue;
+        if (entry.is_reverted) continue;
 
-      try {
-        const data = JSON.parse(entry.data);
-        const amount = data.amount || {};
+        try {
+            const data = JSON.parse(entry.data);
 
-        if (entry.entry_type === 'deposit') {
-          for (const [denom, count] of Object.entries(amount)) {
-            newBalance[parseInt(denom)] += count as number;
-          }
-        } else if (entry.entry_type === 'withdrawal') {
-          for (const [denom, count] of Object.entries(amount)) {
-            newBalance[parseInt(denom)] -= count as number;
-          }
+            if (entry.entry_type === 'deposit') {
+                for (const [denom, count] of Object.entries(data.amount || {})) {
+                    newBalance[parseInt(denom)] += count as number;
+                }
+            } else if (entry.entry_type === 'withdrawal') {
+                for (const [denom, count] of Object.entries(data.amount || {})) {
+                    newBalance[parseInt(denom)] -= count as number;
+                }
+            } else if (entry.entry_type === 'sale') {
+                if (data.paidAmount) {
+                    for (const [denom, count] of Object.entries(data.paidAmount)) {
+                        newBalance[parseInt(denom)] += count as number;
+                    }
+                }
+                if (data.changeGiven) {
+                    for (const [denom, count] of Object.entries(data.changeGiven)) {
+                        newBalance[parseInt(denom)] -= count as number;
+                    }
+                }
+            } else if (entry.entry_type === 'reversal') {
+                const originalEntry = entryMap.get(data.original_entry_id);
+                if (originalEntry) {
+                    const originalData = JSON.parse(originalEntry.data);
+                    if (originalEntry.entry_type === 'deposit') {
+                        for (const [denom, count] of Object.entries(originalData.amount || {})) {
+                            newBalance[parseInt(denom)] -= count as number;
+                        }
+                    } else if (originalEntry.entry_type === 'withdrawal') {
+                        for (const [denom, count] of Object.entries(originalData.amount || {})) {
+                            newBalance[parseInt(denom)] += count as number;
+                        }
+                    } else if (originalEntry.entry_type === 'sale') {
+                        if (originalData.paidAmount) {
+                            for (const [denom, count] of Object.entries(originalData.paidAmount)) {
+                                newBalance[parseInt(denom)] -= count as number;
+                            }
+                        }
+                        if (originalData.changeGiven) {
+                            for (const [denom, count] of Object.entries(originalData.changeGiven)) {
+                                newBalance[parseInt(denom)] += count as number;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Failed to parse ledger entry data', e);
         }
-        // TODO: Handle 'sale' change calculation
-
-      } catch (e) {
-        console.error('Failed to parse ledger entry data', e);
-      }
     }
     
     const grandTotal = Object.entries(newBalance).reduce((sum, [denom, count]) => sum + (parseInt(denom) * count), 0);

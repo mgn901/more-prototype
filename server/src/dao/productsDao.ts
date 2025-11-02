@@ -42,10 +42,23 @@ export const createProductsDao = (db: DatabaseExecutor) => {
     await db.exec(query, [productId]);
   };
 
+  const findProductById = async (productId: number): Promise<Product | null> => {
+    const query = 'SELECT * FROM products WHERE id = ?';
+    const results = await db.exec(query, [productId]);
+    return results.length > 0 ? results[0] : null;
+  };
+
+  const findProductsBySellerName = async (posInstanceId: string, sellerName: string): Promise<Product[]> => {
+    const query = 'SELECT * FROM products WHERE pos_instance_id = ? AND seller_name = ? AND is_deleted = FALSE';
+    return db.exec(query, [posInstanceId, sellerName]);
+  };
+
   return {
     listProductsByPosInstance,
     createProduct,
     updateProduct,
     deleteProduct,
+    findProductById,
+    findProductsBySellerName,
   };
 };
