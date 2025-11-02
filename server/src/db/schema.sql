@@ -1,9 +1,9 @@
-CREATE TABLE pos_instances (
+CREATE TABLE IF NOT EXISTS pos_instances (
     id TEXT PRIMARY KEY,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     pos_instance_id TEXT NOT NULL,
     name TEXT NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE products (
     FOREIGN KEY (pos_instance_id) REFERENCES pos_instances(id)
 );
 
-CREATE TABLE discount_conditions (
+CREATE TABLE IF NOT EXISTS discount_conditions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     pos_instance_id TEXT NOT NULL,
     type TEXT NOT NULL, -- 'quantity_discount' or 'value_discount'
@@ -28,17 +28,17 @@ CREATE TABLE discount_conditions (
     FOREIGN KEY (pos_instance_id) REFERENCES pos_instances(id)
 );
 
-CREATE TABLE ledger_entries (
+CREATE TABLE IF NOT EXISTS ledger_entries (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     pos_instance_id TEXT NOT NULL,
-    entry_type TEXT NOT NULL, -- 'sale', 'deposit', 'withdrawal', 'reversal'
+    entry_type TEXT NOT NULL, -- 'sale', 'deposit', 'withdrawal' or 'reversal'
     data TEXT NOT NULL, -- JSON string for entry details
     is_reverted BOOLEAN DEFAULT FALSE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     FOREIGN KEY (pos_instance_id) REFERENCES pos_instances(id)
 );
 
-CREATE TABLE ledger_reversals (
+CREATE TABLE IF NOT EXISTS ledger_reversals (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     pos_instance_id TEXT NOT NULL,
     original_ledger_entry_id INTEGER NOT NULL,
