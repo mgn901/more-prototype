@@ -2,8 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { Product } from '../pages/ProductMasterPage';
 import { AccountingPhase, CartItem, DenominationCount } from '../pages/PosInstancePage';
-
-const denominations = [10000, 5000, 2000, 1000, 500, 100, 50, 10, 5, 1];
+import { DENOMINATIONS } from '../utils.ts';
 
 type OperationAreaProps = {
   phase: AccountingPhase;
@@ -63,7 +62,7 @@ const ProductRegistration: React.FC<Pick<OperationAreaProps, 'onAddToCart' | 'se
 };
 
 // --- PaymentInterface ---
-const PaymentInterface: React.FC<Pick<OperationAreaProps, 'setPhase' | 'totalPrice' | 'finalizeSale' | 'error' | 'setError' | 'cart'> > = ({ setPhase, totalPrice, finalizeSale, error, setError, cart }) => {
+const PaymentInterface: React.FC<Pick<OperationAreaProps, 'setPhase' | 'totalPrice' | 'finalizeSale' | 'error' | 'setError' | 'cart'>> = ({ setPhase, totalPrice, finalizeSale, error, setError, cart }) => {
   const [paidAmount, setPaidAmount] = useState<DenominationCount>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -94,7 +93,7 @@ const PaymentInterface: React.FC<Pick<OperationAreaProps, 'setPhase' | 'totalPri
         </span>
       </div>
       <div className="flex-grow grid grid-cols-2 md:grid-cols-3 gap-2">
-        {denominations.map(d => (
+        {DENOMINATIONS.map(d => (
           <div key={d} className="bg-g0-800 rounded-lg p-2 flex flex-col items-center justify-center">
             <label className="text-sm text-g1-300">{d.toLocaleString()}円</label>
             <div className="flex items-center mt-1">
@@ -117,7 +116,7 @@ const PaymentInterface: React.FC<Pick<OperationAreaProps, 'setPhase' | 'totalPri
 }
 
 // --- ChangeInterface ---
-const ChangeInterface: React.FC<Pick<OperationAreaProps, 'changeToGive' | 'startNewTransaction'> > = ({ changeToGive, startNewTransaction }) => {
+const ChangeInterface: React.FC<Pick<OperationAreaProps, 'changeToGive' | 'startNewTransaction'>> = ({ changeToGive, startNewTransaction }) => {
   const totalChange = Object.entries(changeToGive).reduce((s, [d, c]) => s + (parseInt(d) * c), 0);
   return (
     <div className="p-4 flex flex-col h-full justify-between">

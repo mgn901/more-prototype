@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { Daos } from '../dao';
+import { calculateBalance } from '../utils.js';
 
 const calculateOptimalPayout = (drawerBalance: { [key: number]: number }, amountToPay: number) => {
     const denominations = Object.keys(drawerBalance).map(Number).sort((a, b) => b - a);
@@ -34,64 +35,8 @@ const calculateOptimalPayout = (drawerBalance: { [key: number]: number }, amount
 
 const getDrawerBalance = async (daos: Daos, instanceId: string) => {
     const entries = await daos.ledger.listLedgerEntriesByPosInstance(instanceId);
-    const balance: { [key: number]: number } = {};
     const denominations = [10000, 5000, 2000, 1000, 500, 100, 50, 10, 5, 1];
-    denominations.forEach(d => balance[d] = 0);
-
-    const entryMap = new Map(entries.map(e => [e.id, e]));
-
-    for (const entry of entries) {
-        if (entry.is_reverted) continue;
-
-        const data = JSON.parse(entry.data);
-
-        if (entry.entry_type === 'deposit') {
-            for (const [denom, count] of Object.entries(data.amount)) {
-                balance[parseInt(denom)] += count as number;
-            }
-        } else if (entry.entry_type === 'withdrawal') {
-            for (const [denom, count] of Object.entries(data.amount)) {
-                balance[parseInt(denom)] -= count as number;
-            }
-        } else if (entry.entry_type === 'sale') {
-            if (data.paidAmount) {
-                for (const [denom, count] of Object.entries(data.paidAmount)) {
-                    balance[parseInt(denom)] += count as number;
-                }
-            }
-            if (data.changeGiven) {
-                for (const [denom, count] of Object.entries(data.changeGiven)) {
-                    balance[parseInt(denom)] -= count as number;
-                }
-            }
-        } else if (entry.entry_type === 'reversal') {
-            const originalEntry = entryMap.get(data.original_entry_id);
-            if (originalEntry) {
-                const originalData = JSON.parse(originalEntry.data);
-                if (originalEntry.entry_type === 'deposit') {
-                    for (const [denom, count] of Object.entries(originalData.amount)) {
-                        balance[parseInt(denom)] -= count as number;
-                    }
-                } else if (originalEntry.entry_type === 'withdrawal') {
-                    for (const [denom, count] of Object.entries(originalData.amount)) {
-                        balance[parseInt(denom)] += count as number;
-                    }
-                } else if (originalEntry.entry_type === 'sale') {
-                    if (originalData.paidAmount) {
-                        for (const [denom, count] of Object.entries(originalData.paidAmount)) {
-                            balance[parseInt(denom)] -= count as number;
-                        }
-                    }
-                    if (originalData.changeGiven) {
-                        for (const [denom, count] of Object.entries(originalData.changeGiven)) {
-                            balance[parseInt(denom)] += count as number;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return balance;
+    return calculateBalance(entries, denominations);
 };
 
 export const registerDrawerRoutes = (fastify: FastifyInstance, daos: Daos) => {
@@ -107,9 +52,8 @@ export const registerDrawerRoutes = (fastify: FastifyInstance, daos: Daos) => {
             let totalSales = 0;
             for (const entry of ledgerEntries) {
                 if (entry.entry_type === 'sale' && !entry.is_reverted) {
-                    const data = JSON.parse(entry.data);
-                    if (data.products && Array.isArray(data.products)) {
-                        for (const productId of data.products) {
+                    if (entry.data.products && Array.isArray(entry.data.products)) {
+                        for (const productId of entry.data.products) {
                             if (sellerProductMap.has(productId)) {
                                 totalSales += sellerProductMap.get(productId)!.price;
                             }
@@ -134,9 +78,8 @@ export const registerDrawerRoutes = (fastify: FastifyInstance, daos: Daos) => {
             let totalDeposits = 0;
             for (const entry of ledgerEntries) {
                 if (entry.entry_type === 'deposit' && !entry.is_reverted) {
-                    const data = JSON.parse(entry.data);
-                    if (data.person === personName) {
-                        totalDeposits += Object.entries(data.amount).reduce((sum, [d, c]) => sum + (parseInt(d) * (c as number)), 0);
+                    if (entry.data.person === personName) {
+                        totalDeposits += Object.entries(entry.data.amount).reduce((sum, [d, c]) => sum + (parseInt(d) * (c as number)), 0);
                     }
                 }
             }

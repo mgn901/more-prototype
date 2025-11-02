@@ -3,36 +3,59 @@ import { useParams } from 'react-router-dom';
 import MenuBar from '../components/MenuBar';
 
 // From server/src/dao/ledgerDao.ts
-type LedgerEntry = {
+
+// Type definitions for the structured `data` field
+export type SaleData = { products: number[]; totalPrice: number; paidAmount: { [key: number]: number }; changeGiven: { [key: number]: number }; };
+export type DepositData = { person: string; amount: { [key: number]: number }; };
+export type WithdrawalData = { person: string; amount: { [key: number]: number }; };
+export type ReversalData = { original_entry_id: number; };
+export type LedgerEntryData = SaleData | DepositData | WithdrawalData | ReversalData;
+
+// Raw type from the database
+type RawLedgerEntry = {
   id: number;
   pos_instance_id: string;
   entry_type: 'sale' | 'deposit' | 'withdrawal' | 'reversal';
-  data: string; // JSON string
+  data: string; // JSON string from DB
   is_reverted: boolean;
   created_at: string;
-};
+}
 
-const formatAmount = (amountObj: { [key: string]: number }) => {
+// The fully typed LedgerEntry for use in the application
+export type LedgerEntry = Omit<RawLedgerEntry, 'data' | 'entry_type'> & ({
+  entry_type: 'sale';
+  data: SaleData;
+} | {
+  entry_type: 'deposit';
+  data: DepositData;
+} | {
+  entry_type: 'withdrawal';
+  data: WithdrawalData;
+} | {
+  entry_type: 'reversal';
+  data: ReversalData;
+});
+
+const formatAmount = (amountObj: { [key: number]: number }) => {
   const total = Object.entries(amountObj).reduce((sum, [denom, count]) => sum + (parseInt(denom) * count), 0);
   return `¥${total.toLocaleString()}`;
 };
 
 const LedgerEntryRow: React.FC<{ entry: LedgerEntry, onRevert: (entryId: number) => void }> = ({ entry, onRevert }) => {
-  const data = JSON.parse(entry.data);
   let description = 'Unknown Entry';
 
   switch (entry.entry_type) {
     case 'sale':
-      description = `売上: ${data.products.length}点, 合計 ${formatAmount({[data.totalPrice]: 1})}`;
+      description = `売上: ${entry.data.products.length}点, 合計 ¥${entry.data.totalPrice.toLocaleString()}`;
       break;
     case 'deposit':
-      description = `入金 (${data.person}): ${formatAmount(data.amount)}`;
+      description = `入金 (${entry.data.person}): ${formatAmount(entry.data.amount)}`;
       break;
     case 'withdrawal':
-      description = `出金 (${data.person}): ${formatAmount(data.amount)}`;
+      description = `出金 (${entry.data.person}): ${formatAmount(entry.data.amount)}`;
       break;
     case 'reversal':
-      description = `[取消] ID:${data.original_entry_id} の操作を取り消し`;
+      description = `[取消] ID:${entry.data.original_entry_id} の操作を取り消し`;
       break;
   }
 
@@ -43,7 +66,7 @@ const LedgerEntryRow: React.FC<{ entry: LedgerEntry, onRevert: (entryId: number)
       <td className="p-3 text-sm text-g1-400">{new Date(entry.created_at).toLocaleString()}</td>
       <td className="p-3">{description}</td>
       <td className="p-3 text-center">
-        {!entry.is_reverted && (
+        {!entry.is_reverted && entry.entry_type !== 'reversal' && (
           <button onClick={() => onRevert(entry.id)} className="text-r8-300 hover:text-r8-200 text-sm">取り消し</button>
         )}
       </td>

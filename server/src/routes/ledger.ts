@@ -20,7 +20,7 @@ export const registerLedgerRoutes = (fastify: FastifyInstance, daos: Daos) => {
   fastify.post('/api/instances/:instanceId/ledger', async (request, reply) => {
     try {
       const { instanceId } = request.params as { instanceId: string };
-      const { entry_type, data } = request.body as { entry_type: LedgerEntry['entry_type'], data: object };
+      const { entry_type, data } = request.body as { entry_type: LedgerEntry['entry_type'], data: LedgerEntry['data'] };
 
       // Basic validation
       if (!['deposit', 'withdrawal', 'sale', 'reversal'].includes(entry_type)) {
